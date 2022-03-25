@@ -1,7 +1,7 @@
 Set-Location -Path .\
 
 Write-Host "********************************"
-Write-Host "********** Установка ***********"
+Write-Host "********** РЈСЃС‚Р°РЅРѕРІРєР° ***********"
 Write-Host "********************************"
 
 # Vars
@@ -13,7 +13,7 @@ $7zPath = "$env:ProgramFiles\7-Zip\7z.exe"
 # Is 7zip installed?
 if (-not (Test-Path $7zPath)) {
     if (-not (winget install 7zip -s winget)) {
-        throw "чоооЁбу дался? где 7z? winget потерял?"
+        throw "С‡РѕРѕРѕРЃР±Сѓ РґР°Р»СЃСЏ? РіРґРµ 7z? winget РїРѕС‚РµСЂСЏР»?"
     }
 }
 Set-Alias 7zip $7zPath
@@ -25,18 +25,18 @@ Set-Alias 7zip $7zPath
 wsl --install
 # Import distro
 if (wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu) {
-    Write-Host "Образ импортирован"
+    Write-Host "РћР±СЂР°Р· РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅ"
 }
 
 # Set environment
 $env:PATH += $dockerPath
-Write-Host "Добавлен PATH $($dockerPath)"
+Write-Host "Р”РѕР±Р°РІР»РµРЅ PATH $($dockerPath)"
 
 $env:PATH += $dockerComposePath
-Write-Host "Добавлен PATH $($dockerComposePath)"
+Write-Host "Р”РѕР±Р°РІР»РµРЅ PATH $($dockerComposePath)"
 
 $env:DOCKER_HOST = $dockerHost
-Write-Host "Добавлен DOCKER_HOST $($env:DOCKER_HOST)"
+Write-Host "Р”РѕР±Р°РІР»РµРЅ DOCKER_HOST $($dockerHost)"
 
 # Start linux
 wsl -d ubuntu-docker
