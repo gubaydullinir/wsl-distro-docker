@@ -1,42 +1,50 @@
-Set-Location -Path .\
+Set-Location $PSScriptRoot
 
-Write-Host "********************************"
-Write-Host "********** Установка ***********"
-Write-Host "********************************"
+Write-Output -ForegroundColor DarkGreen "Setup"
 
 # Vars
-$dockerPath = "$(Get-Location)\docker"
-$dockerComposePath = "$(Get-Location)\docker\cli-plugins"
+$context = "$(Get-Location)"
+$dockerPath = ";$context\docker"
+$dockerComposePath = ";$context\docker\cli-plugins"
+$zipArchive = "ubuntu.zip.001"
 $dockerHost = "tcp://127.0.0.1:2375"
-$7zPath = "$env:ProgramFiles\7-Zip\7z.exe"
+$7zPath = "$env:ProgramFiles\7-Zip"
 
 # Is 7zip installed?
 if (-not (Test-Path $7zPath)) {
     if (-not (winget install 7zip -s winget)) {
-        throw "чоооЁбу дался? где 7z? winget потерял?"
+        throw "Choooezhed up? where the пїЅhoooezh is 7z? Choooezhed up winget?"
     }
 }
-Set-Alias 7zip $7zPath
+
+$env:PATH += ";$7zPath"
 
 # Expand distro
-7zip  e ".\ubuntu.zip.001"
+7z e $zipArchive
 
 # Install wsl
-wsl --install
+#wsl --install
+
 # Import distro
 if (wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu) {
-    Write-Host "Образ импортирован"
+    Write-Output "- Imported Distro"
 }
 
+Write-Host -ForegroundColor DarkGreen "*"
+
 # Set environment
-$env:PATH += $dockerPath
-Write-Host "Добавлен PATH $($dockerPath)"
+$env:Path += $dockerPath
+$env:Path + $dockerComposePath
+[environment]::SetenvironmentVariable("Path", $env:Path, [System.environmentVariableTarget]::User)
+Write-Output "- Setted PATH"
 
-$env:PATH += $dockerComposePath
-Write-Host "Добавлен PATH $($dockerComposePath)"
-
+#  Set DOCKER_HOST
+Write-Host -ForegroundColor DarkGreen "*"
 $env:DOCKER_HOST = $dockerHost
-Write-Host "Добавлен DOCKER_HOST $($env:DOCKER_HOST)"
+[environment]::SetenvironmentVariable("DOCKER_HOST", $env:DOCKER_HOST, [System.environmentVariableTarget]::User)
+Write-Output "- Added DOCKER_HOSTT"
 
+Write-Host -ForegroundColor DarkGreen "*"
+Write-Output "- Done"
 # Start linux
 wsl -d ubuntu-docker
