@@ -34,7 +34,7 @@ Write-Host -ForegroundColor DarkGreen "*"
 
 # Set environment
 $env:Path += $dockerPath
-$env:Path + $dockerComposePath
+$env:Path += $dockerComposePath
 [environment]::SetenvironmentVariable("Path", $env:Path, [System.environmentVariableTarget]::User)
 Write-Output "- Setted PATH"
 
