@@ -28,23 +28,25 @@ $env:PATH += ";$7zPath"
 # Import distro
 if (wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu) {
     Write-Output "- Imported Distro"
+} else {
+    Write-Output "- wsl error"
 }
 
-Write-Host -ForegroundColor DarkGreen "*"
+Write-Output "*"
 
 # Set environment
+Write-Output "- Set PATH"
 $env:Path += $dockerPath
 $env:Path += $dockerComposePath
 [environment]::SetenvironmentVariable("Path", $env:Path, [System.environmentVariableTarget]::User)
 Write-Output "- Setted PATH"
 
 #  Set DOCKER_HOST
-Write-Host -ForegroundColor DarkGreen "*"
+Write-Output "- Set DOCKER_HOST"
 $env:DOCKER_HOST = $dockerHost
 [environment]::SetenvironmentVariable("DOCKER_HOST", $env:DOCKER_HOST, [System.environmentVariableTarget]::User)
-Write-Output "- Added DOCKER_HOSTT"
+Write-Output "- Setted DOCKER_HOST"
 
-Write-Host -ForegroundColor DarkGreen "*"
 Write-Output "- Done"
 # Start linux
 wsl -d ubuntu-docker
