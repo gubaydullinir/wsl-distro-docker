@@ -1,49 +1,41 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host -ForegroundColor DarkGreen "Setup"
-
 # Vars
-$7zFile = "${env:ProgramFiles}\7-Zip\7z.exe"
+$7zPath = "${env:ProgramFiles}s\7-Zip"
 $zipArchive = "distro/ubuntu.zip.001"
 $dockerPath = "$(Get-Location)\docker"
 $dockerComposePath = "${dockerPath}\cli-plugins"
 $dockerHost = "tcp://127.0.0.1:2375"
 
 # Check if 7zip installed
-if (Test-Path $7zFile) {
-    $7z = $7zFile
-} elseif (Get-Command 7z) {
-    $7z = '7z'
-} else {
+if (Test-Path $7zPath) {
+    $env:Path += $7zPath
+} elseif (-Not (Get-Command 7z)) {
     throw "7z not installed!"
 }
 
-Write-Host "7z is $7z"
-
-# Expand distro
-& $7z e $zipArchive
-Write-Host -ForegroundColor Yellow "Archive successfully extracted!"
+# Extract distro
+Write-Host "Extracting distro" -ForegroundColor Green 
+& 7z e $zipArchive
+Write-Host "Distro successfully extracted!" -ForegroundColor Green 
 
 # Import distro
-Write-Host -ForegroundColor Yellow "Importing WSL distributive"
-if (wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu) {
-    Write-Host -ForegroundColor Green "Distributive successfully imported"
-} else {
-    Write-Host -ForegroundColor Red "WSL Error!!!"
-}
+Write-Host "Importing WSL distro" -ForegroundColor Yellow 
+wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu
+Write-Host "Distro successfully imported!" -ForegroundColor Green 
 
 # Set environment
-Write-Host "- Set PATH"
+Write-Host "Adding docker & docker-compose to PATH" -ForegroundColor Yellow 
 $env:Path += ";${dockerPath};${dockerComposePath}"
 [environment]::SetenvironmentVariable("Path", $env:Path, [System.environmentVariableTarget]::User)
-Write-Host "- Setted PATH"
+Write-Host "added!" -ForegroundColor Green
 
-#  Set DOCKER_HOST
-Write-Host "- Set DOCKER_HOST"
+# Set DOCKER_HOST
+Write-Host "Adding DOCKER_HOST to ENV" -ForegroundColor Yellow 
 $env:DOCKER_HOST = $dockerHost
 [environment]::SetenvironmentVariable("DOCKER_HOST", $env:DOCKER_HOST, [System.environmentVariableTarget]::User)
-Write-Host "- Setted DOCKER_HOST"
+Write-Host "added!" -ForegroundColor Green
 
-Write-Host "- Done"
+Write-Host "`nStarting wsl..." -ForegroundColor Green 
 # Start linux
 wsl -d ubuntu-docker
