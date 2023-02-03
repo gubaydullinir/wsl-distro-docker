@@ -1,52 +1,45 @@
-Set-Location $PSScriptRoot
-
-Write-Output -ForegroundColor DarkGreen "Setup"
+$ErrorActionPreference = "Stop"
 
 # Vars
-$context = "$(Get-Location)"
-$dockerPath = ";$context\docker"
-$dockerComposePath = ";$context\docker\cli-plugins"
-$zipArchive = "ubuntu.zip.001"
+$7zPath = "${env:ProgramFiles}s\7-Zip"
+$zipArchive = "distro/ubuntu.zip.001"
+$dockerPath = "$(Get-Location)\docker"
+$dockerComposePath = "${dockerPath}\cli-plugins"
 $dockerHost = "tcp://127.0.0.1:2375"
-$7zPath = "$env:ProgramFiles\7-Zip"
 
-# Is 7zip installed?
-if (-not (Test-Path $7zPath)) {
-    if (-not (winget install 7zip -s winget)) {
-        throw "Choooezhed up? where the �hoooezh is 7z? Choooezhed up winget?"
+# Check if 7zip installed
+if (-Not (Get-Command 7z)) {
+    if (Test-Path $7zPath) {
+        Write-Host "Adding 7zip installation folder to PATH" -ForegroundColor Yellow
+        $env:Path += $7zPath
+    }
+    else {
+        throw "7zip not found!"
     }
 }
 
-$env:PATH += ";$7zPath"
-
-# Expand distro
-7z e $zipArchive
-
-# Install wsl
-#wsl --install
+# Extract distro
+Write-Host "Extracting distro" -ForegroundColor Green 
+& 7z e $zipArchive
+Write-Host "Distro successfully extracted!" -ForegroundColor Green 
 
 # Import distro
-if (wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu) {
-    Write-Output "- Imported Distro"
-} else {
-    Write-Output "- wsl error"
-}
-
-Write-Output "*"
+Write-Host "Importing WSL distro" -ForegroundColor Yellow 
+wsl --import ubuntu-docker $env:HOME\WSL .\ubuntu
+Write-Host "Distro successfully imported!" -ForegroundColor Green 
 
 # Set environment
-Write-Output "- Set PATH"
-$env:Path += $dockerPath
-$env:Path += $dockerComposePath
+Write-Host "Adding docker & docker-compose to PATH" -ForegroundColor Yellow 
+$env:Path += ";${dockerPath};${dockerComposePath}"
 [environment]::SetenvironmentVariable("Path", $env:Path, [System.environmentVariableTarget]::User)
-Write-Output "- Setted PATH"
+Write-Host "added!" -ForegroundColor Green
 
-#  Set DOCKER_HOST
-Write-Output "- Set DOCKER_HOST"
+# Set DOCKER_HOST
+Write-Host "Adding DOCKER_HOST to ENV" -ForegroundColor Yellow 
 $env:DOCKER_HOST = $dockerHost
 [environment]::SetenvironmentVariable("DOCKER_HOST", $env:DOCKER_HOST, [System.environmentVariableTarget]::User)
-Write-Output "- Setted DOCKER_HOST"
+Write-Host "added!" -ForegroundColor Green
 
-Write-Output "- Done"
+Write-Host "`nStarting wsl..." -ForegroundColor Green 
 # Start linux
 wsl -d ubuntu-docker
