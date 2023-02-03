@@ -8,10 +8,14 @@ $dockerComposePath = "${dockerPath}\cli-plugins"
 $dockerHost = "tcp://127.0.0.1:2375"
 
 # Check if 7zip installed
-if (Test-Path $7zPath) {
-    $env:Path += $7zPath
-} elseif (-Not (Get-Command 7z)) {
-    throw "7z not installed!"
+if (-Not (Get-Command 7z)) {
+    if (Test-Path $7zPath) {
+        Write-Host "Adding 7zip installation folder to PATH" -ForegroundColor Yellow
+        $env:Path += $7zPath
+    }
+    else {
+        throw "7zip not found!"
+    }
 }
 
 # Extract distro
